@@ -1,5 +1,5 @@
 - [x] Architecture Design
-- [ ] Select temperature sensor: DS18B20
+- [x] Select temperature sensor: DS18B20
 - [ ] Select components for MCU MCS 51
 - [ ] How to upload code to MCU MCS 51
 - [ ] Try project in breadboard
