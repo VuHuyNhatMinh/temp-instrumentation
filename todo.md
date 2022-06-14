@@ -4,3 +4,6 @@
 - [ ] How to upload code to MCU MCS 51
 - [ ] Try project in breadboard
 - [ ] Make PCB
+- [ ] calculate average datas taken in for accuracy	(now we only present realtime data sent back from sensor)
+- [ ] sampling every ten secs, user timer (now we're preseting data to 7seg every time sensor sends sample) 
+- [ ] break out of warning loop using interupt, only push (now we are using holding-button to break out)
