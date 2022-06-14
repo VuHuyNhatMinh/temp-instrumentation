@@ -181,14 +181,24 @@ anl button_ok, #04h		// button_ok = button_ok & 00000100
 mov a, button_ok
 ;mov b, ok_set
 cjne a,#4, RESET		//neu bam nut button_ok thi thoat khoi cai SETUP
-NEXT_LED_WARNING:
-cjne a,b,NOT_EQUAL
 jmp LED_WARNING
 
 
 RESET:
-jmp CONVERT
-jmp NEXT_LED_WARNING
+setb ale
+clr ale
+setb start
+jb eoc,$	   //$ chính là dia chi hien tai, cu nhay lai dong nay den khi eoc = 1 thi moi sang cau lenh tiep theo
+clr start
+;mov r7,#150
+;de: lcall hienthi
+;djnz r7,de
+mov a,p3
+mov b, num_set
+cjne a,b,NOT_EQUAL_1
+jmp LED_WARNING
+NOT_EQUAL_1:
+jc MAIN
 
 DELAY_1:
 mov r7,#250				//#250
