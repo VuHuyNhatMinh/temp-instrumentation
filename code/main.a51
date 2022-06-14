@@ -35,7 +35,7 @@ clr p2.0
 clr p1.7
 
 SETUP:
-clr psw.7
+clr c
 setb led_orange
 clr led_white
 mov button_inc, p2  		//		, lay gia tri bit p2.1 roi luu vao button_inc
@@ -80,8 +80,6 @@ NUM_SET_NOT_EQU:
 jc NEXT_2
 jmp LED_WARNING
 
-
-
 MAIN:
 clr led_orange
 setb led_white
@@ -93,9 +91,6 @@ lcall HEX_BCD
 lcall BCD_7SEG
 lcall SHOW
 sjmp MAIN
-
-
-
 
 CONVERT:
 setb ale
@@ -130,6 +125,9 @@ mov 31h,a
 ;mov 10h,b
 mov 30h,b
 ret
+
+TO_MAIN:
+jmp MAIN
 
 BCD_7SEG:
 mov dptr,#ma7seg
@@ -173,8 +171,10 @@ ret
 
 LED_WARNING:
 setb led
+lcall SHOW_WARNING
 lcall DELAY_2
 clr led
+lcall OFF_WARNING
 lcall DELAY_2
 mov button_ok, p2  		//		, lay gia tri bit p2.2 roi luu vao button_ok, h nut nay la nut reset
 anl button_ok, #04h		// button_ok = button_ok & 00000100
@@ -198,7 +198,27 @@ mov b, num_set
 cjne a,b,NOT_EQUAL_1
 jmp LED_WARNING
 NOT_EQUAL_1:
-jc MAIN
+jc TO_MAIN
+jmp LED_WARNING
+
+SHOW_WARNING:
+;mov num,20h
+mov num,#0bfh
+setb donvi
+;mov num,21h
+mov num,#0bfh
+setb chuc
+;mov num,22h
+mov num,#0bfh
+setb tram
+ret
+
+OFF_WARNING:
+clr donvi
+clr chuc
+clr tram
+ret
+
 
 DELAY_1:
 mov r7,#250				//#250
