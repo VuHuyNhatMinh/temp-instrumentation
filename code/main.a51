@@ -18,11 +18,43 @@ start bit p1.6	;allow converting
 eoc bit p1.4	;converting succeed
 ale bit p1.5	;allow communicating
 	
-led bit p2.0
-led_orange bit p2.7			//test led
+led bit p3.0
+led_orange bit p3.7			//test led
 led_white bit p1.7			//test led
+led_interrupt bit p3.6
 org 00h
+ljmp START_X
 	
+org 0013h
+ljmp 030h
+
+;org 030h		//ham interrupt cho external interrupt, co nhay vao interrupt nhung ma bi loi
+;setb ale		
+;clr ale
+;setb start
+;jb eoc,$	   //$ chính là dia chi hien tai, cu nhay lai dong nay den khi eoc = 1 thi moi sang cau lenh tiep theo
+;clr start
+;;mov r7,#150
+;;de: lcall hienthi
+;;djnz r7,de
+;mov a,p2
+;mov b, num_set
+;cjne a,b,NOT_EQUAL_1
+;reti
+;NOT_EQUAL_1:
+;jc TO_MAIN			//TO_MAIN		DANG BI LOI LA TUY A<B NHUNG MA HAM JC KHONG CHAY
+;setb led_interrupt
+;reti
+;TO_MAIN:
+;clr c
+;POP 0150h
+;POP 0150h 
+;;MOV DPH,#01h		//cho cái dia chi 0BFh cua cai MAIN vao stack pointer
+;MOV 0150h,#0BFh
+;PUSH 0150h
+;reti
+
+START_X:			//set up parameter
 mov inc_set, #0h		//nut set so cai dat
 mov ok_set, #0h		//nut ok 
 mov num_set, #80		//luu so duoc cai dat// cho so ban dau bay gio là 87
@@ -30,15 +62,16 @@ mov p2, #0ffh		//port2 là internal pull up, keo internal pullup len
 mov p1,#0ffh		//port1 cung là internal pull up, keo internal pullup len
 mov a, #0h    
 mov p3, #0ffh		//kéo internal pull_up cua port 3 len de cho port 3 la input
-clr p2.7
-clr p2.0
+clr p3.7
+clr p3.0
 clr p1.7
+clr p3.6
 
-SETUP:
+SETUP:				
 clr c
 setb led_orange
 clr led_white
-mov button_inc, p2  		//		, lay gia tri bit p2.1 roi luu vao button_inc
+mov button_inc, p3  		//		, lay gia tri bit p2.1 roi luu vao button_inc
 anl button_inc, #02h		// button_inc = button_inc & 00000010
 mov a, button_inc
 mov b, inc_set
@@ -49,11 +82,11 @@ lcall HEX_BCD
 lcall BCD_7SEG
 lcall SHOW
 
-mov button_ok, p2  		//		, lay gia tri bit p2.2 roi luu vao button_ok
-anl button_ok, #04h		// button_inc = button_inc & 00000100
+mov button_ok, p3 		//		, lay gia tri bit p2.2 roi luu vao button_ok
+anl button_ok, #08h		// button_inc = button_inc & 00001000
 mov a, button_ok
 ;mov b, ok_set
-cjne a,#4, MAIN		//neu bam nut button_ok thi thoat khoi cai SETUP
+cjne a,#8, MAIN		//neu bam nut button_ok thi thoat khoi cai SETUP
 sjmp SETUP
 
 NOT_EQ_INC_SET:
@@ -78,12 +111,16 @@ jmp NEXT_1
 
 NUM_SET_NOT_EQU:
 jc NEXT_2
-jmp LED_WARNING
+jmp WARNING
 
-MAIN:
-clr led_orange
-setb led_white
-lcall CONVERT
+;org 70h		
+MAIN:			
+clr IE.7
+clr led		//turn off led warning
+clr led_orange			//led test
+setb led_white					//led test
+lcall CONVERT				
+//to-do: process sampling datas
 cjne a,b,NOT_EQUAL
 NEXT:
 clr c
@@ -101,7 +138,7 @@ clr start
 ;mov r7,#150
 ;de: lcall hienthi
 ;djnz r7,de
-mov a,p3
+mov a,p2
 mov b, num_set
 ;cjne a,b,NOT_EQUAL
 ret
@@ -109,7 +146,7 @@ ret
 NOT_EQUAL:
 jc NEXT
 ;jc MAIN
-jmp LED_WARNING
+jmp WARNING
 
 
 HEX_BCD:			
@@ -126,8 +163,8 @@ mov 31h,a
 mov 30h,b
 ret
 
-TO_MAIN:
-jmp MAIN
+;TO_MAIN:
+;jmp MAIN
 
 BCD_7SEG:
 mov dptr,#ma7seg
@@ -169,37 +206,42 @@ lcall DELAY_1
 anl p1,#0f0h
 ret
 
-LED_WARNING:
+WARNING:
+clr led_interrupt
+clr TCON.2	//trigger by low level signal
+setb IE.2
+setb IE.7
+WARNING_NEXT:
 setb led
 lcall SHOW_WARNING
 lcall DELAY_2
 clr led
 lcall OFF_WARNING
 lcall DELAY_2
-mov button_ok, p2  		//		, lay gia tri bit p2.2 roi luu vao button_ok, h nut nay la nut reset
-anl button_ok, #04h		// button_ok = button_ok & 00000100
-mov a, button_ok
-;mov b, ok_set
-cjne a,#4, RESET		//neu bam nut button_ok thi thoat khoi cai SETUP
-jmp LED_WARNING
+;mov button_ok, p3  		//		, lay gia tri bit p2.2 roi luu vao button_ok, h nut nay la nut reset
+;anl button_ok, #04h		// button_ok = button_ok & 00000100
+;mov a, button_ok
+;;mov b, ok_set
+;cjne a,#4, RESET		//neu bam nut button_ok thi thoat khoi cai SETUP
+jmp WARNING_NEXT
 
 
-RESET:
-setb ale
-clr ale
-setb start
-jb eoc,$	   //$ chính là dia chi hien tai, cu nhay lai dong nay den khi eoc = 1 thi moi sang cau lenh tiep theo
-clr start
-;mov r7,#150
-;de: lcall hienthi
-;djnz r7,de
-mov a,p3
-mov b, num_set
-cjne a,b,NOT_EQUAL_1
-jmp LED_WARNING
-NOT_EQUAL_1:
-jc TO_MAIN
-jmp LED_WARNING
+;RESET:
+;setb ale
+;clr ale
+;setb start
+;jb eoc,$	   //$ chính là dia chi hien tai, cu nhay lai dong nay den khi eoc = 1 thi moi sang cau lenh tiep theo
+;clr start
+;;mov r7,#150
+;;de: lcall hienthi
+;;djnz r7,de
+;mov a,p2
+;mov b, num_set
+;cjne a,b,NOT_EQUAL_1
+;jmp LED_WARNING
+;NOT_EQUAL_1:
+;jc TO_MAIN
+;jmp LED_WARNING
 
 SHOW_WARNING:
 ;mov num,20h
