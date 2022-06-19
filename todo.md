@@ -1,10 +1,10 @@
 - [x] Architecture Design
-- [x] Select temperature sensor: DS18B20
-- [ ] Select components for MCU MCS 51
-- [X] How to upload code to MCU MCS 51
+- [x] Select temperature sensor: LM35
+- [x] Select components for MCU MCS 51: AT89S52
+- [x] How to upload code to MCU MCS 51
 - [ ] Try project in breadboard
 - [ ] Make PCB
 - [ ] calculate average datas taken in for accuracy	(now we only present realtime data sent back from sensor)
 - [ ] sampling every ten secs, user timer (now we're preseting data to 7seg every time sensor sends sample) 
 - [ ] break out of warning loop using interupt, only push (now we are using holding-button to break out)
-- [ ] How to read from a bit of 8051 port
+- [ ] How to read a single bit from 8051 port
