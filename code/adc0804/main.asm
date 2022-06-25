@@ -14,19 +14,19 @@ LOOP:
 	SJMP LOOP
 
 CONVERT:
-	CLR P2.4
-	LCALL DELAY_10
-	SETB P2.4
+	CLR P2.4	//wr
+	LCALL DELAY_10	
+	SETB P2.4	//wr
 	
-	JB P2.3, $	
+	JB P2.3, $	//wait
 	
-	CLR P2.5	
+	CLR P2.5	//rd
 	LCALL DELAY_10
 
 
 	MOV A, P1
 	LCALL DISPLAY
-	SETB P2.5
+	SETB P2.5	//rd
 	
 	RET
 	
