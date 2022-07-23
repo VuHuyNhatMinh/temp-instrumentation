@@ -2,9 +2,12 @@
 - [x] Select temperature sensor: LM35
 - [x] Select components for MCU MCS 51: AT89S52
 - [x] How to upload code to MCU MCS 51
-- [ ] Try project in breadboard
-- [ ] Make PCB
+- [x] Try project in breadboard
+- [x] Make PCB
 - [ ] calculate average datas taken in for accuracy	(now we only present realtime data sent back from sensor)
-- [ ] sampling every ten secs, user timer (now we're preseting data to 7seg every time sensor sends sample) 
-- [ ] break out of warning loop using interupt, only push (now we are using holding-button to break out)
+- [x] sampling every ten secs, user timer (now we're preseting data to 7seg every time sensor sends sample) 
+- [ x break out of warning loop using interupt, only push (now we are using holding-button to break out)
 - [ ] How to read a single bit from 8051 port
+- [ ] Create PCB v2
+- [ ] Optimize Software v2
+- [ ] Write README.md
